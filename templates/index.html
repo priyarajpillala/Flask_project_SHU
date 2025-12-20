@@ -23,8 +23,21 @@
 
     </form>
 
-    <p>not a user? register <a href="{{url_for("registration")}}">here</a></p>
 
     <p><a href="{{url_for("loginerrors")}}">can't login?</a></p>
 </div>
+{% endblock %}
+
+{% block sidecontent %}
+
+
+
+    <div class="card text-center mt-3">
+        <div class="card-body">
+            <p>Don't have an account? create <a href="{{url_for("registration")}}" class="btn btn-primary">now</a></p>
+        </div>
+    </div>
+
+
+
 {% endblock %}

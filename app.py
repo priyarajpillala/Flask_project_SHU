@@ -28,9 +28,19 @@ def index():
         email=request.form['useremail']
         password=request.form['userpassword']
 
-        flash(category='success', message=f"The Form Was Posted Successfully! Well Done {username}")
-        
-    return render_template("index.html")
+        error = None
+        if not email:
+            error = 'Username is Required!'
+        elif not password:
+            error = 'Password is Required!'
+
+        if error is none:
+            flash(category='success', message=f"The Form Was Posted Successfully! Well Done {username}")
+            return redirect (url_for("home"))
+        else:
+            flash(category='danger', message=f"Login failed: {error}")
+
+     return render_template("index.html")
 
 
 @app.route("/home/")
