@@ -1,83 +1,179 @@
-from flask import Flask, render_template, url_for, request, flash, redirect
-
-from flask_wtf import CSRFProtect
-from flask_wtf.csrf import generate_csrf
-
+from flask import Flask, render_template, request, redirect, url_for, flash, session
+from db.db import *
+import random
 
 app = Flask(__name__)
-
-app.secret_key = 'your_secret_key'  # Required for CSRF protection
-csrf = CSRFProtect(app)  # This automatically protects all POST routes
-
-@app.context_processor
-def inject_csrf_token():
-    return dict(csrf_token=generate_csrf())
+app.secret_key = "royal_red_secret_key"
 
 
-
-
-# @app.context_processor
-# def inject_site_name():
-#     return dict()
-
-
-
-@app.route("/", methods=['GET','post'])
+@app.route("/")
 def index():
-    if request.method == 'post':
-        email=request.form['useremail']
-        password=request.form['userpassword']
+    if "user_id" in session:
+        recipes = get_all_recipes()
+    else:
+        recipes = get_latest_recipes(5)
 
-        error = None
-        if not email:
-            error = 'Username is Required!'
-        elif not password:
-            error = 'Password is Required!'
+    return render_template("index.html", recipes=recipes)
 
-        if error is none:
-            flash(category='success', message=f"The Form Was Posted Successfully! Well Done {username}")
-            return redirect (url_for("home"))
+
+@app.route("/recipes/")
+def recipes():
+    if "user_id" not in session:
+        flash("Login required to view all recipes", "warning")
+        return redirect(url_for("login"))
+
+    recipes = get_all_recipes()
+    return render_template("recipes.html", recipes=recipes)
+
+
+@app.route("/recipe/<int:id>/")
+def recipe(id):
+    recipe = get_recipe_by_id(id)
+    return render_template("recipe.html", recipe=recipe)
+
+
+@app.route("/register/", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+
+        # Check if user already exists
+        if get_user_by_username(username):
+            flash("Username already exists", "danger")
+            return render_template("register.html")
+
+        # Generate OTP
+        otp = random.randint(100000, 999999)
+
+        # Store temporary registration data in session
+        session["reg_username"] = username
+        session["reg_password"] = password
+        session["reg_otp"] = otp
+
+        print("REGISTRATION OTP:", otp)  # Simulated OTP send
+
+        return redirect(url_for("verify_otp"))
+
+    return render_template("register.html")
+
+
+
+@app.route("/verify-otp/", methods=["GET", "POST"])
+def verify_otp():
+    if request.method == "POST":
+        entered_otp = request.form["otp"]
+
+        # Compare OTP
+        if str(session.get("reg_otp")) == entered_otp:
+            # Create user only after OTP verification
+            create_user(
+                session["reg_username"],
+                session["reg_password"]
+            )
+
+            # Log the user in
+            user = get_user_by_username(session["reg_username"])
+            session["user_id"] = user["id"]
+
+            # Clear temporary session data
+            session.pop("reg_username")
+            session.pop("reg_password")
+            session.pop("reg_otp")
+
+            flash("Registration successful", "success")
+            return redirect(url_for("recipes"))
         else:
-            flash(category='danger', message=f"Login failed: {error}")
+            flash("Invalid OTP", "danger")
 
-     return render_template("index.html")
-
-
-@app.route("/home/")
-def home():
-    return render_template("home.html")
+    return render_template("verify_otp.html")
 
 
-@app.route("/registration/" , methods=('GET', 'POST'))
-def registration():
-    if request.method=="POST":
-        USERNAME = request.form['username']
-        PASSWORD = request.form['password']
-        REPASSWORD = request.form['repassword']
 
-        # Simple validation checks
-        error = None
-        if not USERNAME:
-            error = 'Username is required!'
-        elif not PASSWORD or not REPASSWORD:
-            error = 'Password is required!'
-        elif PASSWORD != REPASSWORD:
-            error = 'Passwords do not match!'
+@app.route("/login/", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
 
-        if error is None:
-            flash(category='success', message=f"The Form Was Posted Successfully! Well Done {username}")
+        user = validate_login(username, password)
+
+        if user is None:
+            flash("Invalid credentials", "danger")
         else:
-            flash(category='danger', message=error)
+            session["user_id"] = user["id"]
+            flash("Login successful", "success")
+            return redirect(url_for("recipes"))
 
-    return render_template("registration.html")
-
-@app.route("/loginproblemlog/")
-def loginerrors():
-    return render_template("loginerrors.html")
+    return render_template("login.html")
 
 
 
+@app.route("/logout/")
+def logout():
+    session.clear()
+    flash("Logged out", "info")
+    return redirect(url_for("index"))
 
 
-if __name__ == '__main__':
+@app.route("/create/", methods=["GET", "POST"])
+def create():
+    if "user_id" not in session:
+        flash("Login required", "danger")
+        return redirect(url_for("login"))
+
+    if request.method == "POST":
+        title = request.form["title"]
+        cuisine = request.form["cuisine"]
+        ingredients = request.form["ingredients"]
+        steps = request.form["steps"]
+
+        create_recipe(title, cuisine, ingredients, steps)
+        flash("Recipe created", "success")
+        return redirect(url_for("recipes"))
+
+    return render_template("create.html")
+
+
+@app.route("/update/<int:id>/", methods=["GET", "POST"])
+def update(id):
+    recipe = get_recipe_by_id(id)
+
+    if request.method == "POST":
+        update_recipe(
+            id,
+            request.form["title"],
+            request.form["cuisine"],
+            request.form["ingredients"],
+            request.form["steps"]
+        )
+        flash("Recipe updated", "success")
+        return redirect(url_for("recipe", id=id))
+
+    return render_template("update.html", recipe=recipe)
+
+
+@app.route("/delete/<int:id>/", methods=["GET", "POST"])
+def delete(id):
+    recipe = get_recipe_by_id(id)
+
+    if request.method == "POST":
+        delete_recipe(id)
+        flash("Recipe deleted", "info")
+        return redirect(url_for("recipes"))
+
+    return render_template("delete.html", recipe=recipe)
+
+
+
+
+
+
+
+
+
+
+
+
+if __name__ == "__main__":
     app.run(debug=True)

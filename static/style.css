@@ -1,3 +1,18 @@
-.body{
-    
+body {
+    background: #7b112c;
+    color: #fff;
+    font-family: Georgia;
+}
+
+nav a {
+    color: gold;
+    margin: 10px;
+    text-decoration: none;
+}
+
+.card {
+    background: #9e1b32;
+    padding: 15px;
+    margin: 10px;
+    border-radius: 10px;
 }

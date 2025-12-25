@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Delete Recipe</h1>
+
+<p>Are you sure you want to delete <strong>{{ recipe.title }}</strong>?</p>
+
+<form method="POST">
+    <button type="submit">Yes, Delete</button>
+    <a href="/">Cancel</a>
+</form>
+
+{% endblock %}

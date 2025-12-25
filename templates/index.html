@@ -1,43 +1,11 @@
 {% extends "base.html" %}
-
 {% block content %}
-<div>
-    <form action="/" method="post">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
-<div>
-    <label for ="email">USERNAME</label>
-<br>
-        <input type="text" id="email" name="useremail" placeholder="enter your e-mail here" value="{{ request.form['username'] }}">
-</div>
-<br>
-
-<div>
-    <label for ="password">PASSWORD</label>
-<br>
-        <input type="text" id="password" name="userpassword" placeholder="enter your password here">
-</div>
-<br>
-
-<button type="button" name="loginbutton" value="LOGIN">LOGIN</button>
-<br>
-
-    </form>
-
-
-    <p><a href="{{url_for("loginerrors")}}">can't login?</a></p>
-</div>
-{% endblock %}
-
-{% block sidecontent %}
-
-
-
-    <div class="card text-center mt-3">
-        <div class="card-body">
-            <p>Don't have an account? create <a href="{{url_for("registration")}}" class="btn btn-primary">now</a></p>
-        </div>
+<h1>Latest Recipes</h1>
+{% for r in recipes %}
+    <div class="card">
+        <h3>{{ r.title }}</h3>
+        <p>{{ r.cuisine }}</p>
+        <a href="/recipe/{{ r.id }}/">View</a>
     </div>
-
-
-
+{% endfor %}
 {% endblock %}

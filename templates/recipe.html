@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>{{ recipe.title }}</h1>
+
+<p><strong>Cuisine:</strong> {{ recipe.cuisine }}</p>
+<p><strong>Ingredients:</strong></p>
+<p>{{ recipe.ingredients }}</p>
+
+<p><strong>Steps:</strong></p>
+<p>{{ recipe.steps }}</p>
+
+{% if session.get('user_id') %}
+    <a href="/update/{{ recipe.id }}/">Edit</a>
+    <a href="/delete/{{ recipe.id }}/">Delete</a>
+{% endif %}
+
+{% endblock %}

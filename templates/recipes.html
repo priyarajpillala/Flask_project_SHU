@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>All Recipes</h1>
+
+{% for recipe in recipes %}
+<div class="card">
+    <h3>{{ recipe.title }}</h3>
+    <p><strong>Cuisine:</strong> {{ recipe.cuisine }}</p>
+    <a href="/recipe/{{ recipe.id }}/">View Recipe</a>
+</div>
+{% endfor %}
+
+{% endblock %}
+

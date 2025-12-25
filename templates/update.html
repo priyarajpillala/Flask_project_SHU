@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Update Recipe</h1>
+
+<form method="POST">
+    <label>Title</label>
+    <input type="text" name="title" value="{{ recipe.title }}" required>
+
+    <label>Cuisine</label>
+    <input type="text" name="cuisine" value="{{ recipe.cuisine }}" required>
+
+    <label>Ingredients</label>
+    <textarea name="ingredients">{{ recipe.ingredients }}</textarea>
+
+    <label>Steps</label>
+    <textarea name="steps">{{ recipe.steps }}</textarea>
+
+    <button type="submit">Update</button>
+</form>
+
+{% endblock %}
