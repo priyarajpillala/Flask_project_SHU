@@ -1,6 +1,18 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>OTP Sent</h1>
-<p>Please check your email/console for OTP.</p>
-<a href="/verify-otp/">Verify OTP</a>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-danger shadow">
+                <div class="card-header bg-danger text-white text-center">
+                    <h3>OTP Sent</h3>
+                </div>
+                <div class="card-body text-center">
+                    <p class="mb-4">Please check your email or console for the OTP.</p>
+                    <a href="{{ url_for('verify_otp') }}" class="btn btn-danger btn-lg w-100">Verify OTP</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
