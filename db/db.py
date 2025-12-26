@@ -69,11 +69,11 @@ def get_recipe_by_id(id):
     return recipe
 
 
-def create_recipe(title, cuisine, ingredients, steps):
+def create_recipe(title, cuisine, ingredients, steps, user_id):
     conn = get_db_connection()
     conn.execute(
-        "INSERT INTO recipes (title, cuisine, ingredients, steps) VALUES (?, ?, ?, ?)",
-        (title, cuisine, ingredients, steps)
+        "INSERT INTO recipes (title, cuisine, ingredients, steps, user_id) VALUES (?, ?, ?, ?,?)",
+        (title, cuisine, ingredients, steps, user_id)
     )
     conn.commit()
     conn.close()
@@ -95,3 +95,19 @@ def delete_recipe(id):
     conn.commit()
     conn.close()
 
+
+
+def get_all_users():
+    conn = get_db_connection()
+    users = conn.execute(
+        "SELECT id, username FROM users"
+    ).fetchall()
+    conn.close()
+    return users
+
+
+def delete_user_by_id(user_id):
+    conn = get_db_connection()
+    conn.execute("DELETE FROM users WHERE id = ?", (user_id,))
+    conn.commit()
+    conn.close()

@@ -68,7 +68,6 @@ def register():
         username = request.form["username"]
         password = request.form["password"]
 
-        # Check if user already exists
         if get_user_by_username(username):
             flash("Username already exists", "danger")
             return render_template("register.html")
@@ -80,15 +79,12 @@ def register():
         msg.set_content('your OTP is :' + OTP )
         server.send_message(msg)
 
-        # Generate OTP
-        # otp = random.randint(100000, 999999)
 
-        # Store temporary registration data in session
         session["reg_username"] = username
         session["reg_password"] = password
         session["reg_otp"] = OTP
 
-        print("REGISTRATION OTP:", OTP)  # Simulated OTP send
+        print("REGISTRATION OTP:", OTP) 
 
         return redirect(url_for("verify_otp"))
 
@@ -101,19 +97,15 @@ def verify_otp():
     if request.method == "POST":
         entered_otp = request.form["otp"]
 
-        # Compare OTP
         if str(session.get("reg_otp")) == entered_otp:
-            # Create user only after OTP verification
             create_user(
                 session["reg_username"],
                 session["reg_password"]
             )
 
-            # Log the user in
             user = get_user_by_username(session["reg_username"])
             session["user_id"] = user["id"]
 
-            # Clear temporary session data
             session.pop("reg_username")
             session.pop("reg_password")
             session.pop("reg_otp")
@@ -163,13 +155,19 @@ def create():
         flash("Login required", "danger")
         return redirect(url_for("login"))
 
+
+    user_id = session["user_id"]
+
+
     if request.method == "POST":
         title = request.form["title"]
         cuisine = request.form["cuisine"]
         ingredients = request.form["ingredients"]
         steps = request.form["steps"]
+        
+        
 
-        create_recipe(title, cuisine, ingredients, steps)
+        create_recipe(title, cuisine, ingredients, steps, user_id)
         flash("Recipe created", "success")
         return redirect(url_for("recipes"))
 
@@ -206,6 +204,28 @@ def delete(id):
     return render_template("delete.html", recipe=recipe)
 
 
+
+@app.route("/admin/dashboard/")
+def admin_dashboard():
+    username = session.get("username")
+
+    if not username or not get_admin_by_username(username):
+        return "Access denied", 403
+
+    users = get_all_users()
+    return render_template("admin_dashboard.html", users=users)
+
+
+
+@app.route("/admin/delete-user/<int:user_id>/", methods=["POST"])
+def admin_delete_user(user_id):
+    username = session.get("username")
+
+    if not username or not get_admin_by_username(username):
+        return "Access denied", 403
+
+    delete_user_by_id(user_id)
+    return redirect("/admin/dashboard/")
 
 
 
