@@ -1,23 +1,38 @@
 <h1>Admin Dashboard</h1>
 
-<h2>Users</h2>
+<h2>Users and Their Recipes</h2>
+
+{% for user in users %}
+<h3>{{ user.username }} (ID: {{ user.id }})</h3>
 
 <table border="1">
     <tr>
-        <th>ID</th>
-        <th>Username</th>
+        <th>Recipe ID</th>
+        <th>Title</th>
+        <th>Cuisine</th>
         <th>Action</th>
     </tr>
 
-    {% for user in users %}
+    {% for recipe in user_recipes.get(user.id, []) %}
     <tr>
-        <td>{{ user.id }}</td>
-        <td>{{ user.username }}</td>
+        <td>{{ recipe.id }}</td>
+        <td>{{ recipe.title }}</td>
+        <td>{{ recipe.cuisine }}</td>
         <td>
-            <form action="/admin/delete-user/{{ user.id }}/" method="post">
-                <button type="submit">Delete</button>
+            <form action="/admin/delete-recipe/{{ recipe.id }}/" method="post" style="display:inline;" onsubmit="return confirmDelete();">
+                    <button type="submit">Delete</button>
             </form>
+
+            <a href="/update/{{ recipe.id }}/">Edit</a>
         </td>
     </tr>
     {% endfor %}
 </table>
+
+{% endfor %}
+
+<h2>Add New Recipe</h2>
+<a href="/create/" method = "POST">add new recipe </a>
+
+<h2><a href="/">home</a></h2>
+

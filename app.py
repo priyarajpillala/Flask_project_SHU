@@ -213,7 +213,21 @@ def admin_dashboard():
         return "Access denied", 403
 
     users = get_all_users()
-    return render_template("admin_dashboard.html", users=users)
+
+    recipes = get_all_recipes()
+
+    user_recipes = {}
+    for recipe in recipes:
+        if recipe["user_id"] not in user_recipes:
+            user_recipes[recipe["user_id"]] = []
+        user_recipes[recipe["user_id"]].append(recipe)
+
+    return render_template(
+        "admin_dashboard.html",
+        users=users,
+        user_recipes=user_recipes
+    )
+
 
 
 
@@ -229,7 +243,14 @@ def admin_delete_user(user_id):
 
 
 
+@app.route("/admin/delete-recipe/<int:recipe_id>/", methods=["POST"])
+def admin_delete_recipe(recipe_id):
+    username = session.get("username")
+    if not username or not get_admin_by_username(username):
+        return "Access denied", 403
 
+    delete_recipe(recipe_id)
+    return redirect("/admin/dashboard/")
 
 
 
