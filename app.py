@@ -49,7 +49,17 @@ def recipes():
 @app.route("/recipe/<int:id>/")
 def recipe(id):
     recipe = get_recipe_by_id(id)
-    return render_template("recipe.html", recipe=recipe)
+
+    username = session.get("username")
+    is_admin = False
+
+    if username:
+        admin_record = get_admin_by_username(username)
+        if admin_record:
+            is_admin = True
+
+    return render_template("recipe.html", recipe=recipe, user_id=session.get("user_id"), is_admin=is_admin)
+
 
 
 @app.route("/register/", methods=["GET", "POST"])
@@ -123,12 +133,16 @@ def login():
         username = request.form["username"]
         password = request.form["password"]
 
+
+
+
         user = validate_login(username, password)
 
         if user is None:
             flash("Invalid credentials", "danger")
         else:
             session["user_id"] = user["id"]
+            session["username"] = user["username"]
             flash("Login successful", "success")
             return redirect(url_for("recipes"))
 

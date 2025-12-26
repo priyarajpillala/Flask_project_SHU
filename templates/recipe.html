@@ -9,9 +9,14 @@
 <p><strong>Steps:</strong></p>
 <p>{{ recipe.steps }}</p>
 
-{% if session.get('user_id') %}
-    <a href="/update/{{ recipe.id }}/">Edit</a>
-    <a href="/delete/{{ recipe.id }}/">Delete</a>
+{% if user_id %}
+    {% if recipe.user_id == user_id or is_admin %}
+        <a href="/update/{{ recipe.id }}/">Edit</a>
+        <a href="/delete/{{ recipe.id }}/">Delete</a>
+    {% endif %}
 {% endif %}
+
+
+
 
 {% endblock %}

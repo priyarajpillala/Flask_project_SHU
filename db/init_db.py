@@ -8,7 +8,7 @@ with open("schema.sql") as f:
 
 cur = connection.cursor()
 
-cur.execute("INSERT INTO users (username, password) VALUES (?, ?)",
+cur.execute("INSERT INTO admins (username, password) VALUES (?, ?)",
             ("admin", generate_password_hash("password")))
 
 recipes = [

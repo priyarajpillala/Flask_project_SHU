@@ -23,8 +23,14 @@ def create_user(username, password):
 def validate_login(username, password):
     user = get_user_by_username(username)
     if user and check_password_hash(user["password"], password):
-        return user
+        return user 
+
+    admin = get_admin_by_username(username)
+    if admin and check_password_hash(admin["password"], password):
+        return admin
+
     return None
+
 
 
 def get_user_by_username(username):
@@ -32,6 +38,12 @@ def get_user_by_username(username):
     user = conn.execute("SELECT * FROM users WHERE username=?", (username,)).fetchone()
     conn.close()
     return user
+
+def get_admin_by_username(username):
+    conn = get_db_connection()
+    admin = conn.execute("SELECT * FROM admins WHERE username=?", (username,)).fetchone()
+    conn.close()
+    return admin
 
 
 def get_all_recipes():
