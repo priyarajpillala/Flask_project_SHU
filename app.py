@@ -125,20 +125,29 @@ def login():
         username = request.form["username"]
         password = request.form["password"]
 
-
-
-
-        user = validate_login(username, password)
-
-        if user is None:
-            flash("Invalid credentials", "danger")
-        else:
+        # Try user login
+        user = get_user_by_username(username)
+        if user and check_password_hash(user["password"], password):
             session["user_id"] = user["id"]
             session["username"] = user["username"]
-            flash("Login successful", "success")
+            session["is_admin"] = False   # 👈 IMPORTANT
+            flash("User login successful", "success")
             return redirect(url_for("recipes"))
 
+        # Try admin login
+        admin = get_admin_by_username(username)
+        if admin and check_password_hash(admin["password"], password):
+            session["user_id"] = admin["id"]
+            session["username"] = admin["username"]
+            session["is_admin"] = True    # 👈 IMPORTANT
+            flash("Admin login successful", "success")
+            return redirect(url_for("admin_dashboard"))
+
+        flash("Invalid credentials", "danger")
+
     return render_template("login.html")
+
+
 
 
 

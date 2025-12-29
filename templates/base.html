@@ -6,16 +6,24 @@
 </head>
 <body>
 <nav>
+<nav>
     <a href="/">Home</a>
-    {% if session.get('user_id') %}
+
+    {% if session.get("user_id") %}
         <a href="/recipes/">All Recipes</a>
+        <a href="/create/">Add Recipe</a>
+
+        {% if session.get("is_admin") %}
+            <a href="/admin/dashboard/">Admin Dashboard</a>
+        {% endif %}
+
         <a href="/logout/">Logout</a>
-        <a href="/create/">add</a>
-        
     {% else %}
         <a href="/login/">Login</a>
         <a href="/register/">Register</a>
     {% endif %}
+</nav>
+
 </nav>
 
 <div class="container">
