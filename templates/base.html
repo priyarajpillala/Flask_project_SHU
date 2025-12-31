@@ -12,9 +12,18 @@
     {% if session.get("user_id") %}
         <a href="/recipes/">All Recipes</a>
         <a href="/create/">Add Recipe</a>
+        <form action="/search/" method="post" style="display:inline;">
+            <input type="text" name="query" placeholder="Search recipes" required>
+            <button type="submit">Search</button>
+        </form>
 
         {% if session.get("is_admin") %}
             <a href="/admin/dashboard/">Admin Dashboard</a>
+        <!-- <form action="/search/" method="post" style="display:inline;">
+            <input type="text" name="query" placeholder="Search recipes" required>
+            <button type="submit">Search</button>
+        </form> -->
+
         {% endif %}
 
         <a href="/logout/">Logout</a>

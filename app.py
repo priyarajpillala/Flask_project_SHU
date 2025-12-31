@@ -61,30 +61,51 @@ def recipe(id):
     return render_template("recipe.html", recipe=recipe, user_id=session.get("user_id"), is_admin=is_admin)
 
 
+@app.route("/search/", methods=["GET", "POST"])
+def search():
+    recipes = []
+    query = ""
+
+    if request.method == "POST":
+        query = request.form.get("query", "").strip()
+        if query:
+            recipes = search_recipes_by_title(query)
+    return render_template("search.html",recipes=recipes,query=query)
+
+
+
 
 @app.route("/register/", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
+        repassword = request.form["repassword"]
 
         if get_user_by_username(username):
             flash("Username already exists", "danger")
             return render_template("register.html")
-        
-        msg=EmailMessage()
+
+        if password != repassword:
+            flash("Passwords do not match", "danger")
+            return render_template("register.html")
+
+        if password == username:
+            flash("Password cannot be the same as username", "danger")
+            return render_template("register.html")
+
+        msg = EmailMessage()
         msg["subject"] = "OTP verification"
         msg["from"] = from_mail
         msg["to"] = username
-        msg.set_content('your OTP is :' + OTP )
+        msg.set_content("Your OTP is: " + OTP)
         server.send_message(msg)
-
 
         session["reg_username"] = username
         session["reg_password"] = password
         session["reg_otp"] = OTP
 
-        print("REGISTRATION OTP:", OTP) 
+        print("REGISTRATION OTP:", OTP)
 
         return redirect(url_for("verify_otp"))
 

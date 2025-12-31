@@ -78,6 +78,16 @@ def create_recipe(title, cuisine, ingredients, steps, user_id):
     conn.commit()
     conn.close()
 
+def search_recipes_by_title(query):
+    conn = get_db_connection()
+
+    recipes = conn.execute("""SELECT * FROM recipes WHERE LOWER(title) = LOWER(?)""",(query,)).fetchall()
+    if not recipes:
+        recipes = conn.execute("""SELECT * FROM recipes WHERE LOWER(title) LIKE LOWER(?)""",(f"%{query}%",)).fetchall()
+    conn.close()
+    return recipes
+
+
 
 def update_recipe(id, title, cuisine, ingredients, steps):
     conn = get_db_connection()

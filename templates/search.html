@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Search Recipes</h1>
+
+<form method="post" action="/search/">
+    <input
+        type="text"
+        name="query"
+        placeholder="Enter recipe name"
+        value="{{ query }}"
+        required
+    >
+    <button type="submit">Search</button>
+</form>
+
+<hr>
+
+{% if recipes %}
+    <h2>Search Results</h2>
+
+    <table border="1" cellpadding="8">
+        <tr>
+            <th>Title</th>
+            <th>Cuisine</th>
+            <th>Action</th>
+        </tr>
+
+        {% for recipe in recipes %}
+        <tr>
+            <td>{{ recipe.title }}</td>
+            <td>{{ recipe.cuisine }}</td>
+            <td>
+                <a href="/recipe/{{ recipe.id }}/">View Recipe</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+{% else %}
+    {% if query %}
+        <p>No recipes found.</p>
+    {% endif %}
+{% endif %}
+
+{% endblock %}
