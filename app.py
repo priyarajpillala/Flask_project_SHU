@@ -242,19 +242,19 @@ def admin_dashboard():
     if not username or not get_admin_by_username(username):
         return "Access denied", 403
 
-    users = get_all_users()
+    all_users = get_all_users()
+    all_recipes = get_all_recipes()
 
-    recipes = get_all_recipes()
+    latest_users = all_users[:3]
+    latest_recipes = all_recipes[:3]
 
     user_recipes = {}
-    for recipe in recipes:
-        if recipe["user_id"] not in user_recipes:
-            user_recipes[recipe["user_id"]] = []
-        user_recipes[recipe["user_id"]].append(recipe)
+    for recipe in latest_recipes:
+        user_recipes.setdefault(recipe["user_id"], []).append(recipe)
 
     return render_template(
         "admin_dashboard.html",
-        users=users,
+        users=latest_users,
         user_recipes=user_recipes
     )
 
@@ -281,6 +281,39 @@ def admin_delete_recipe(recipe_id):
 
     delete_recipe(recipe_id)
     return redirect("/admin/dashboard/")
+
+
+@app.route("/admin/users/")
+def admin_users():
+    username = session.get("username")
+
+    if not username or not get_admin_by_username(username):
+        return "Access denied", 403
+
+    users = get_all_users()
+    return render_template("users_list.html", users=users)
+
+
+@app.route("/admin/recipes/")
+def admin_recipes():
+    username = session.get("username")
+
+    if not username or not get_admin_by_username(username):
+        return "Access denied", 403
+
+    users = get_all_users()
+    recipes = get_all_recipes()
+
+    user_recipes = {}
+    for recipe in recipes:
+        user_recipes.setdefault(recipe["user_id"], []).append(recipe)
+
+    return render_template(
+        "recipes_by_users.html",
+        users=users,
+        user_recipes=user_recipes
+    )
+
 
 
 
