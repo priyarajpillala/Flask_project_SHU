@@ -20,7 +20,6 @@ OTP = ""
 for i in range(6):
     OTP += str(random.randint(0,9))
 
-
 server = smtplib.SMTP('smtp.gmail.com',587)
 server.starttls()
 from_mail = "priyarajpillala1999@gmail.com"
@@ -35,7 +34,6 @@ def index():
 
     return render_template("index.html", recipes=recipes)
 
-
 @app.route("/recipes/")
 def recipes():
     if "user_id" not in session:
@@ -44,22 +42,6 @@ def recipes():
 
     recipes = get_all_recipes()
     return render_template("recipes.html", recipes=recipes)
-
-
-@app.route("/recipe/<int:id>/")
-def recipe(id):
-    recipe = get_recipe_by_id(id)
-
-    username = session.get("username")
-    is_admin = False
-
-    if username:
-        admin_record = get_admin_by_username(username)
-        if admin_record:
-            is_admin = True
-
-    return render_template("recipe.html", recipe=recipe, user_id=session.get("user_id"), is_admin=is_admin)
-
 
 @app.route("/search/", methods=["GET", "POST"])
 def search():
@@ -71,9 +53,6 @@ def search():
         if query:
             recipes = search_recipes_by_title(query)
     return render_template("search.html",recipes=recipes,query=query)
-
-
-
 
 @app.route("/register/", methods=["GET", "POST"])
 def register():
@@ -111,8 +90,6 @@ def register():
 
     return render_template("register.html")
 
-
-
 @app.route("/verify-otp/", methods=["GET", "POST"])
 def verify_otp():
     if request.method == "POST":
@@ -138,29 +115,27 @@ def verify_otp():
 
     return render_template("verify_otp.html")
 
-
-
 @app.route("/login/", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
         username = request.form["username"]
         password = request.form["password"]
 
-        # Try user login
+        #  user login
         user = get_user_by_username(username)
         if user and check_password_hash(user["password"], password):
             session["user_id"] = user["id"]
             session["username"] = user["username"]
-            session["is_admin"] = False   # 👈 IMPORTANT
+            session["is_admin"] = False   #  IMPORTANT
             flash("User login successful", "success")
             return redirect(url_for("recipes"))
 
-        # Try admin login
+        #  admin login
         admin = get_admin_by_username(username)
         if admin and check_password_hash(admin["password"], password):
             session["user_id"] = admin["id"]
             session["username"] = admin["username"]
-            session["is_admin"] = True    # 👈 IMPORTANT
+            session["is_admin"] = True    #  IMPORTANT
             flash("Admin login successful", "success")
             return redirect(url_for("admin_dashboard"))
 
@@ -168,16 +143,11 @@ def login():
 
     return render_template("login.html")
 
-
-
-
-
 @app.route("/logout/")
 def logout():
     session.clear()
     flash("Logged out", "info")
     return redirect(url_for("index"))
-
 
 @app.route("/create/", methods=["GET", "POST"])
 def create():
@@ -185,9 +155,7 @@ def create():
         flash("Login required", "danger")
         return redirect(url_for("login"))
 
-
     user_id = session["user_id"]
-
 
     if request.method == "POST":
         title = request.form["title"]
@@ -195,14 +163,11 @@ def create():
         ingredients = request.form["ingredients"]
         steps = request.form["steps"]
         
-        
-
         create_recipe(title, cuisine, ingredients, steps, user_id)
         flash("Recipe created", "success")
         return redirect(url_for("recipes"))
 
     return render_template("create.html")
-
 
 @app.route("/update/<int:id>/", methods=["GET", "POST"])
 def update(id):
@@ -221,7 +186,6 @@ def update(id):
 
     return render_template("update.html", recipe=recipe)
 
-
 @app.route("/delete/<int:id>/", methods=["GET", "POST"])
 def delete(id):
     recipe = get_recipe_by_id(id)
@@ -232,8 +196,6 @@ def delete(id):
         return redirect(url_for("recipes"))
 
     return render_template("delete.html", recipe=recipe)
-
-
 
 @app.route("/admin/dashboard/")
 def admin_dashboard():
@@ -252,14 +214,7 @@ def admin_dashboard():
     for recipe in latest_recipes:
         user_recipes.setdefault(recipe["user_id"], []).append(recipe)
 
-    return render_template(
-        "admin_dashboard.html",
-        users=latest_users,
-        user_recipes=user_recipes
-    )
-
-
-
+    return render_template("admin_dashboard.html",users=latest_users,user_recipes=user_recipes)
 
 @app.route("/admin/delete-user/<int:user_id>/", methods=["POST"])
 def admin_delete_user(user_id):
@@ -271,8 +226,6 @@ def admin_delete_user(user_id):
     delete_user_by_id(user_id)
     return redirect("/admin/dashboard/")
 
-
-
 @app.route("/admin/delete-recipe/<int:recipe_id>/", methods=["POST"])
 def admin_delete_recipe(recipe_id):
     username = session.get("username")
@@ -281,7 +234,6 @@ def admin_delete_recipe(recipe_id):
 
     delete_recipe(recipe_id)
     return redirect("/admin/dashboard/")
-
 
 @app.route("/admin/users/")
 def admin_users():
@@ -292,7 +244,6 @@ def admin_users():
 
     users = get_all_users()
     return render_template("users_list.html", users=users)
-
 
 @app.route("/admin/recipes/")
 def admin_recipes():
@@ -314,11 +265,82 @@ def admin_recipes():
         user_recipes=user_recipes
     )
 
+@app.route("/recipe/<int:id>/", methods=["GET", "POST"])
+def recipe(id):
+    recipe = get_recipe_by_id(id)
+    user_id = session.get("user_id")
+    is_admin = False
+    username = session.get("username")
+    if username and get_admin_by_username(username):
+        is_admin = True
 
+    if request.method == "POST" and "comment" in request.form and user_id:
+        content = request.form["comment"].strip()
+        if content:
+            add_comment(id, user_id, content)
+            flash("Comment added!", "success")
+            return redirect(url_for("recipe", id=id))
 
+    comments = get_comments_by_recipe(id)
 
+    saved = False
+    if user_id:
+        saved_recipes = get_saved_recipes_by_user(user_id)
+        saved = any(r["id"] == id for r in saved_recipes)
 
+    return render_template("recipe.html",recipe=recipe,user_id=user_id,is_admin=is_admin,comments=comments,saved=saved)
 
+@app.route("/save-recipe/<int:id>/", methods=["POST"])
+def save_recipe_route(id):
+    if "user_id" not in session:
+        flash("Login to save recipes", "danger")
+        return redirect(url_for("login"))
+    save_recipe(session["user_id"], id)
+    flash("Recipe saved!", "success")
+    return redirect(url_for("recipe", id=id))
+
+@app.route("/unsave-recipe/<int:id>/", methods=["POST"])
+def unsave_recipe_route(id):
+    if "user_id" not in session:
+        flash("Login to unsave recipes", "danger")
+        return redirect(url_for("login"))
+    unsave_recipe(session["user_id"], id)
+    flash("Recipe unsaved!", "info")
+    return redirect(url_for("recipe", id=id))
+
+@app.route("/saved-recipes/")
+def saved_recipes_route():
+    if "user_id" not in session:
+        return redirect(url_for("login"))
+    recipes = get_saved_recipes_by_user(session["user_id"])
+    return render_template("saved_recipes.html", recipes=recipes)
+
+@app.route("/admin/saved-recipes/")
+def admin_saved_recipes():
+    if not session.get("username") or not get_admin_by_username(session.get("username")):
+        return "Access denied", 403
+
+    saved = get_all_saved_recipes()
+    return render_template("admin_saved_recipes.html", saved=saved)
+
+@app.route("/admin/delete-comment/<int:id>/", methods=["POST"])
+def admin_delete_comment(id):
+    if not session.get("username") or not get_admin_by_username(session.get("username")):
+        return "Access denied", 403
+    delete_comment(id)
+    flash("Comment deleted", "info")
+    return redirect(request.referrer or url_for("admin_dashboard"))
+
+@app.route("/delete-comment/<int:id>/", methods=["POST"])
+def delete_own_comment(id):
+    if "user_id" not in session:
+        flash("You must be logged in to delete comments", "danger")
+        return redirect(url_for("login"))
+
+    user_id = session["user_id"]
+    delete_comment_by_user(id, user_id)
+    flash("Comment deleted", "info")
+    return redirect(request.referrer or url_for("recipes"))
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Your Saved Recipes</h1>
+
+{% if recipes %}
+    {% for r in recipes %}
+        <div style="border:1px solid #ccc; padding:10px; margin-bottom:10px;">
+            <h3>{{ r.title }}</h3>
+            <p><strong>Cuisine:</strong> {{ r.cuisine }}</p>
+            <a href="/recipe/{{ r.id }}/">View Recipe</a> |
+
+            <form method="POST" action="/unsave-recipe/{{ r.id }}/" style="display:inline;">
+                <button type="submit">Unsave</button>
+            </form>
+        </div>
+    {% endfor %}
+{% else %}
+    <p>You have no saved recipes yet.</p>
+{% endif %}
+
+{% endblock %}

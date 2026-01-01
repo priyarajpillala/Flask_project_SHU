@@ -121,3 +121,95 @@ def delete_user_by_id(user_id):
     conn.execute("DELETE FROM users WHERE id = ?", (user_id,))
     conn.commit()
     conn.close()
+
+
+def add_comment(recipe_id, user_id, content):
+    conn = get_db_connection()
+    conn.execute("INSERT INTO comments (recipe_id, user_id, content) VALUES (?, ?, ?)", (recipe_id, user_id, content))
+    conn.commit()
+    conn.close()
+
+def get_comments_by_recipe(recipe_id):
+    conn = get_db_connection()
+    comments = conn.execute("""
+        SELECT c.*, u.username FROM comments c
+        JOIN users u ON c.user_id = u.id
+        WHERE c.recipe_id = ?
+        ORDER BY c.created ASC
+    """, (recipe_id,)).fetchall()
+    conn.close()
+    return comments
+
+def delete_comment(comment_id):
+    conn = get_db_connection()
+    conn.execute("DELETE FROM comments WHERE id=?", (comment_id,))
+    conn.commit()
+    conn.close()
+
+
+def save_recipe(user_id, recipe_id):
+    conn = get_db_connection()
+    try:
+        conn.execute("INSERT INTO saved_recipes (user_id, recipe_id) VALUES (?, ?)", (user_id, recipe_id))
+        conn.commit()
+    except sqlite3.IntegrityError:
+        pass
+    conn.close()
+
+def unsave_recipe(user_id, recipe_id):
+    conn = get_db_connection()
+    conn.execute("DELETE FROM saved_recipes WHERE user_id=? AND recipe_id=?", (user_id, recipe_id))
+    conn.commit()
+    conn.close()
+
+
+def get_saved_recipes_by_user(user_id):
+    conn = get_db_connection()
+    recipes = conn.execute("""
+        SELECT r.* FROM recipes r
+        JOIN saved_recipes s ON r.id = s.recipe_id
+        WHERE s.user_id = ?
+        ORDER BY r.created DESC
+    """, (user_id,)).fetchall()
+    conn.close()
+    return recipes
+
+def get_all_saved_recipes(): #for admin
+    """
+    Returns a dictionary where keys are usernames
+    and values are lists of their saved recipes
+    """
+    conn = get_db_connection()
+    rows = conn.execute("""
+        SELECT sr.recipe_id, r.title, r.cuisine, u.username
+        FROM saved_recipes sr
+        JOIN users u ON sr.user_id = u.id
+        JOIN recipes r ON sr.recipe_id = r.id
+        ORDER BY u.username, r.title
+    """).fetchall()
+    conn.close()
+
+    saved = {}
+    for row in rows:
+        username = row["username"]
+        saved.setdefault(username, []).append({
+            "recipe_id": row["recipe_id"],
+            "title": row["title"],
+            "cuisine": row["cuisine"]
+        })
+    return saved
+
+
+def delete_comment_by_user(comment_id, user_id):
+    """
+    Deletes a comment if it belongs to the given user
+    """
+    conn = get_db_connection()
+    conn.execute(
+        "DELETE FROM comments WHERE id = ? AND user_id = ?",
+        (comment_id, user_id)
+    )
+    conn.commit()
+    conn.close()
+
+

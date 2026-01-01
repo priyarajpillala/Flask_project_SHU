@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>All Saved Recipes by Users</h1>
+
+{% if saved %}
+    {% for username, recipes in saved.items() %}
+        <h3>{{ username }}</h3>
+        <table border="1" cellpadding="8" style="margin-bottom:20px;">
+            <tr>
+                <th>Recipe Title</th>
+                <th>Cuisine</th>
+            </tr>
+            {% for r in recipes %}
+            <tr>
+                <td><a href="/recipe/{{ r.recipe_id }}/">{{ r.title }}</a></td>
+                <td>{{ r.cuisine }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% endfor %}
+{% else %}
+    <p>No saved recipes yet.</p>
+{% endif %}
+
+{% endblock %}
