@@ -1,22 +1,84 @@
 {% extends "base.html" %}
+
 {% block content %}
-<h1>Update Recipe</h1>
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header text-white text-center">
+                    <h2 class="mb-0">
+                        <i class="bi bi-pencil-fill"></i> Update Recipe
+                    </h2>
+                    <p class="mb-0 mt-2"><small>Refine your culinary creation</small></p>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        
+                        <div class="mb-4">
+                            <label for="title" class="form-label">
+                                <i class="bi bi-pencil-square"></i> Recipe Title
+                            </label>
+                            <input 
+                                type="text" 
+                                name="title" 
+                                id="title"
+                                class="form-control form-control-lg" 
+                                value="{{ recipe.title }}" 
+                                required
+                            >
+                        </div>
 
-<form method="POST">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <label>Title</label>
-    <input type="text" name="title" value="{{ recipe.title }}" required>
+                        <div class="mb-4">
+                            <label for="cuisine" class="form-label">
+                                <i class="bi bi-globe-americas"></i> Cuisine Type
+                            </label>
+                            <input 
+                                type="text" 
+                                name="cuisine" 
+                                id="cuisine"
+                                class="form-control form-control-lg" 
+                                value="{{ recipe.cuisine }}" 
+                                required
+                            >
+                        </div>
 
-    <label>Cuisine</label>
-    <input type="text" name="cuisine" value="{{ recipe.cuisine }}" required>
+                        <div class="mb-4">
+                            <label for="ingredients" class="form-label">
+                                <i class="bi bi-basket-fill"></i> Ingredients
+                            </label>
+                            <textarea 
+                                name="ingredients" 
+                                id="ingredients"
+                                class="form-control" 
+                                rows="6"
+                            >{{ recipe.ingredients }}</textarea>
+                        </div>
 
-    <label>Ingredients</label>
-    <textarea name="ingredients">{{ recipe.ingredients }}</textarea>
+                        <div class="mb-4">
+                            <label for="steps" class="form-label">
+                                <i class="bi bi-list-ol"></i> Preparation Steps
+                            </label>
+                            <textarea 
+                                name="steps" 
+                                id="steps"
+                                class="form-control" 
+                                rows="8"
+                            >{{ recipe.steps }}</textarea>
+                        </div>
 
-    <label>Steps</label>
-    <textarea name="steps">{{ recipe.steps }}</textarea>
-
-    <button type="submit">Update</button>
-</form>
-
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="bi bi-check-circle-fill"></i> Update Recipe
+                            </button>
+                            <a href="/recipe/{{ recipe.id }}/" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

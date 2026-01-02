@@ -1,18 +1,301 @@
+:root {
+    --royal-red: #C8102E;
+    --navy-blue: #012169;
+    --gold: #D4AF37;
+    --cream: #FFF8DC;
+    --grey: #2C3E50;
+    --white: #FFFFFF;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
-    background: #7b112c;
-    color: #fff;
-    font-family: Georgia;
+    font-family: 'Georgia', serif;
+    background: linear-gradient(135deg, #FFF8DC 0%, #F5F5DC 100%);
+    color: var(--grey);
+    line-height: 1.7;
 }
 
-nav a {
-    color: gold;
-    margin: 10px;
-    text-decoration: none;
+/* Animated Background */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(45deg, transparent, transparent 50px, rgba(200,16,46,0.02) 50px, rgba(200,16,46,0.02) 100px);
+    pointer-events: none;
+    z-index: -1;
+    animation: bgMove 120s linear infinite;
 }
 
+@keyframes bgMove {
+    0% { background-position: 0 0; }
+    100% { background-position: 100px 100px; }
+}
+
+/* Navigation */
+nav.navbar {
+    background: linear-gradient(135deg, var(--navy-blue), var(--royal-red)) !important;
+    padding: 1.2rem 2rem !important;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3) !important;
+    border-bottom: 3px solid var(--gold);
+    animation: slideDown 0.6s ease-out;
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.navbar-brand.logo {
+    color: var(--white) !important;
+    font-size: 2rem !important;
+    font-weight: 900 !important;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    transition: all 0.5s ease;
+}
+
+.navbar-brand.logo:hover {
+    transform: scale(1.1);
+    color: var(--gold) !important;
+}
+
+.navbar-brand.logo:hover i {
+    animation: spin 0.6s ease;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.navbar .nav-link {
+    color: var(--white) !important;
+    font-weight: 600 !important;
+    padding: 0.8rem 1.5rem !important;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.navbar .nav-link::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 3px;
+    background: var(--gold);
+    transform: translateX(-50%);
+    transition: width 0.3s ease;
+}
+
+.navbar .nav-link:hover::before {
+    width: 80%;
+}
+
+.navbar .nav-link:hover {
+    background: rgba(255,255,255,0.2) !important;
+    transform: translateY(-3px);
+}
+
+/* Forms */
+.form-control {
+    padding: 1rem !important;
+    border: 2px solid #ddd !important;
+    border-radius: 10px !important;
+    background: var(--cream) !important;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--gold) !important;
+    box-shadow: 0 0 15px rgba(212,175,55,0.4) !important;
+    transform: translateY(-2px);
+    background: var(--white) !important;
+}
+
+.form-label {
+    color: var(--navy-blue) !important;
+    font-weight: 700;
+}
+
+/* Buttons */
+.btn {
+    padding: 1rem 2.5rem;
+    border-radius: 30px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.5s, height 0.5s;
+}
+
+.btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, var(--royal-red), var(--navy-blue)) !important;
+    border: none !important;
+}
+
+.btn-warning {
+    background: var(--gold) !important;
+    color: var(--navy-blue) !important;
+    border: none !important;
+}
+
+/* Cards */
 .card {
-    background: #9e1b32;
-    padding: 15px;
-    margin: 10px;
+    border-radius: 20px !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+    border: none !important;
+    transition: all 0.4s ease;
+    overflow: hidden;
+}
+
+.card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.25) !important;
+}
+
+.card-header {
+    background: linear-gradient(135deg, var(--royal-red), var(--navy-blue)) !important;
+    color: var(--white) !important;
+    padding: 1.8rem !important;
+    border: none !important;
+}
+
+.card-header h3,
+.card-header p,
+.card-header small {
+    color: var(--white) !important;
+}
+
+.card-body {
+    padding: 2rem !important;
+}
+
+/* Headings */
+h1, .display-3, .display-4 {
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+}
+
+.text-white {
+    color: var(--white) !important;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.lead.text-white {
+    color: var(--white) !important;
+}
+
+/* Tables */
+table {
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+thead {
+    background: linear-gradient(135deg, var(--navy-blue), var(--royal-red));
+}
+
+th {
+    color: var(--navy-blue) !important; /*changed*/
+    padding: 1.2rem !important;
+    font-weight: 700;
+}
+
+tbody tr {
+    transition: all 0.3s ease;
+}
+
+tbody tr:hover {
+    background: var(--cream);
+    transform: scale(1.01);
+}
+
+/* Alerts */
+.alert {
+    border-radius: 15px !important;
+    padding: 1.3rem !important;
+    animation: slideIn 0.5s ease;
+}
+
+@keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}
+
+/* Badges */
+.badge {
+    padding: 0.6rem 1.2rem !important;
+    border-radius: 25px !important;
+    font-weight: 600 !important;
+}
+
+/* Container */
+.container {
+    animation: fadeIn 0.8s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--cream);
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(var(--royal-red), var(--navy-blue));
     border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--gold);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .navbar-brand.logo {
+        font-size: 1.5rem !important;
+    }
+    h1, .display-3 {
+        font-size: 2rem;
+    }
 }

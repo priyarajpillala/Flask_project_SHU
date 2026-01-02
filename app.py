@@ -15,14 +15,14 @@ def inject_csrf_token():
     return dict(csrf_token=generate_csrf)
 
 
-OTP = ""
-for i in range(6):
-    OTP += str(random.randint(0,9))
+# OTP = ""
+# for i in range(6):
+#     OTP += str(random.randint(0,9))
 
-server = smtplib.SMTP('smtp.gmail.com',587)
-server.starttls()
-from_mail = "priyarajpillala1999@gmail.com"
-server.login(from_mail,'fbky qdtm ippg nupj')
+# server = smtplib.SMTP('smtp.gmail.com',587)
+# server.starttls()
+# from_mail = "priyarajpillala1999@gmail.com"
+# server.login(from_mail,'fbky qdtm ippg nupj')
 
 @app.route("/")
 def index():
@@ -61,9 +61,6 @@ def search():
     return render_template("search.html", recipes=recipes, query=query)
 
 
-
-
-
 @app.route("/register/", methods=("GET", "POST"))
 def register():
     if request.method == "POST":
@@ -83,12 +80,26 @@ def register():
             flash("Password cannot be the same as username", "danger")
             return render_template("register.html")
 
+        # Generate NEW OTP for THIS registration
+        OTP = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+        
+        # Create email
         msg = EmailMessage()
         msg["subject"] = "OTP verification"
-        msg["from"] = from_mail
+        msg["from"] = "priyarajpillala1999@gmail.com"
         msg["to"] = username
         msg.set_content("Your OTP is: " + OTP)
-        server.send_message(msg)
+        
+        # Send email with NEW connection each time
+        try:
+            server = smtplib.SMTP('smtp.gmail.com', 587)
+            server.starttls()
+            server.login('priyarajpillala1999@gmail.com', 'fbky qdtm ippg nupj')
+            server.send_message(msg)
+            server.quit()  # Close connection after sending
+        except Exception as e:
+            flash(f"Email sending failed: {str(e)}", "danger")
+            return render_template("register.html")
 
         session["reg_username"] = username
         session["reg_password"] = password

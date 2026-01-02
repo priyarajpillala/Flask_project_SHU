@@ -1,13 +1,51 @@
 {% extends "base.html" %}
+
 {% block content %}
-<h1>Verify OTP</h1>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-lg border-0">
+                <div class="card-header text-center text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-shield-fill-check"></i> Verify OTP
+                    </h3>
+                    <p class="mb-0 mt-2"><small>Enter the code sent to complete registration</small></p>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        
+                        <div class="mb-4">
+                            <label for="otp" class="form-label">
+                                <i class="bi bi-lock-fill"></i> One-Time Password
+                            </label>
+                            <input 
+                                type="text" 
+                                name="otp" 
+                                id="otp"
+                                class="form-control form-control-lg text-center" 
+                                placeholder="Enter 6-digit OTP" 
+                                required
+                                maxlength="6"
+                                pattern="[0-9]{6}"
+                            >
+                            <small class="text-muted">
+                                <i class="bi bi-info-circle"></i> Please check your registered email or phone
+                            </small>
+                        </div>
 
-<form method="POST">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <label>Enter OTP</label>
-    <input type="text" name="otp" required>
-
-    <button type="submit">Verify</button>
-</form>
-
+                        <button type="submit" class="btn btn-danger btn-lg w-100 mt-3">
+                            <i class="bi bi-check-circle-fill"></i> Verify & Complete Registration
+                        </button>
+                    </form>
+                </div>
+                <div class="card-footer text-center bg-light">
+                    <p class="mb-0 text-muted">
+                        <small>Didn't receive the code? Check your spam folder</small>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

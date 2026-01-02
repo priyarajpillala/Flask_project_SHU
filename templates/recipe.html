@@ -1,68 +1,147 @@
 {% extends "base.html" %}
+
 {% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Recipe Header -->
+            <div class="card shadow-lg border-0 mb-4">
+                <div class="card-header text-white">
+                    <h1 class="mb-0">
+                        <i class="bi bi-award-fill text-warning"></i> {{ recipe.title }}
+                    </h1>
+                </div>
+                <div class="card-body p-4">
+                    <p class="mb-3">
+                        <span class="badge bg-primary fs-6 rounded-pill">
+                            <i class="bi bi-globe-americas"></i> {{ recipe.cuisine }} Cuisine
+                        </span>
+                    </p>
+                    
+                    <hr class="my-4">
+                    
+                    <!-- Ingredients Section -->
+                    <div class="mb-4">
+                        <h3 class="text-danger">
+                            <i class="bi bi-basket-fill"></i> Ingredients
+                        </h3>
+                        <div class="ingredients-box p-3 bg-light rounded">
+                            <p class="mb-0" style="white-space: pre-line;">{{ recipe.ingredients }}</p>
+                        </div>
+                    </div>
 
-<h1>{{ recipe.title }}</h1>
+                    <!-- Steps Section -->
+                    <div class="mb-4">
+                        <h3 class="text-danger">
+                            <i class="bi bi-list-ol"></i> Preparation Steps
+                        </h3>
+                        <div class="steps-box p-3 bg-light rounded">
+                            <p class="mb-0" style="white-space: pre-line;">{{ recipe.steps }}</p>
+                        </div>
+                    </div>
 
-<p><strong>Cuisine:</strong> {{ recipe.cuisine }}</p>
-<p><strong>Ingredients:</strong></p>
-<p>{{ recipe.ingredients }}</p>
+                    <!-- Action Buttons -->
+                    {% if user_id %}
+                        {% if user_id == recipe.user_id or is_admin %}
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-start mb-3">
+                            <a href="/update/{{ recipe.id }}/" class="btn btn-warning">
+                                <i class="bi bi-pencil-fill"></i> Edit Recipe
+                            </a>
+                            <a href="/delete/{{ recipe.id }}/" class="btn btn-danger">
+                                <i class="bi bi-trash-fill"></i> Delete Recipe
+                            </a>
+                        </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
 
-<p><strong>Steps:</strong></p>
-<p>{{ recipe.steps }}</p>
+            <!-- Save/Unsave Recipe -->
+            {% if user_id and not is_admin %}
+            <div class="card shadow-lg border-0 mb-4">
+                <div class="card-body text-center">
+                    <form method="POST" action="{% if saved %}/unsave-recipe/{{ recipe.id }}/{% else %}/save-recipe/{{ recipe.id }}/{% endif %}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <button type="submit" class="btn btn-{% if saved %}outline-danger{% else %}success{% endif %} btn-lg">
+                            <i class="bi bi-{% if saved %}bookmark-dash{% else %}bookmark-plus{% endif %}-fill"></i> 
+                            {% if saved %}Remove from Saved Recipes{% else %}Save Recipe{% endif %}
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
 
-{% if user_id %}
-    {% if user_id == recipe.user_id or is_admin %}
-        <a href="/update/{{ recipe.id }}/">Edit</a>
-        <a href="/delete/{{ recipe.id }}/">Delete</a>
-    {% endif %}
-{% endif %}
+            <!-- Comments Section -->
+            <div class="card shadow-lg border-0">
+                <div class="card-header text-white">
+                    <h3 class="mb-0">
+                        <i class="bi bi-chat-dots-fill"></i> Comments
+                    </h3>
+                </div>
+                <div class="card-body p-4">
+                    {% if user_id %}
+                    <form method="post" class="mb-4">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <div class="mb-3">
+                            <label for="comment" class="form-label fw-bold">
+                                <i class="bi bi-pencil-square"></i> Add Your Comment
+                            </label>
+                            <textarea 
+                                name="comment" 
+                                id="comment"
+                                class="form-control" 
+                                rows="3" 
+                                placeholder="Share your thoughts about this recipe..."
+                                required
+                            ></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-send-fill"></i> Post Comment
+                        </button>
+                    </form>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle-fill"></i> 
+                        <a href="/login/" class="alert-link">Login</a> to leave a comment.
+                    </div>
+                    {% endif %}
 
-<hr>
+                    <hr>
 
-{% if user_id and not is_admin%}
-    <form method="POST" action="{% if saved %}/unsave-recipe/{{ recipe.id }}/{% else %}/save-recipe/{{ recipe.id }}/{% endif %}">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <button type="submit">
-            {% if saved %}Unsave{% else %}Save{% endif %} Recipe
-        </button>
-    </form>
-{% endif %}
-
-<hr>
-
-<h3>Comments</h3>
-
-{% if user_id %}
-<form method="post">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-        <textarea name="comment" rows="3" placeholder="Add your comment" required></textarea><br>
-        <button type="submit">Post Comment</button>
-    </form>
-{% else %}
-    <p><a href="/login/">Login</a> to comment.</p>
-{% endif %}
-
-<ul>
-{% for c in comments %}
-    <li>
-        <strong>{{ c.username }}</strong> ({{ c.created }}): {{ c.content }}
-
-        {% if is_admin %}
-            <form method="POST" action="/admin/delete-comment/{{ c.id }}/" style="display:inline;"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button type="submit">Delete</button>
-            </form>
-        {% elif user_id == c.user_id %}
-            <form method="POST" action="/delete-comment/{{ c.id }}/" style="display:inline;">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <button type="submit">Delete</button>
-            </form>
-        {% endif %}
-    </li>
-{% else %}
-    <li>No comments yet.</li>
-{% endfor %}
-</ul>
-
-
+                    <!-- Comments List -->
+                    <div class="comments-list">
+                        {% for c in comments %}
+                        <div class="comment-item p-3 mb-3 border rounded bg-light">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <strong class="text-primary">
+                                        <i class="bi bi-person-circle"></i> {{ c.username }}
+                                    </strong>
+                                    <small class="text-muted ms-2">
+                                        <i class="bi bi-clock-fill"></i> {{ c.created }}
+                                    </small>
+                                </div>
+                                
+                                {% if is_admin or user_id == c.user_id %}
+                                <form method="POST" action="{% if is_admin %}/admin/delete-comment/{{ c.id }}/{% else %}/delete-comment/{{ c.id }}/{% endif %}" style="display:inline;">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Delete this comment?')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                                {% endif %}
+                            </div>
+                            <p class="mb-0 mt-2">{{ c.content }}</p>
+                        </div>
+                        {% else %}
+                        <div class="alert alert-secondary text-center">
+                            <i class="bi bi-chat-text"></i> No comments yet. Be the first to comment!
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

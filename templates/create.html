@@ -1,22 +1,94 @@
 {% extends "base.html" %}
+
 {% block content %}
-<h1>Create Recipe</h1>
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header text-white text-center">
+                    <h2 class="mb-0">
+                        <i class="bi bi-plus-circle-fill"></i> Create New Recipe
+                    </h2>
+                    <p class="mb-0 mt-2"><small>Share your culinary masterpiece with the kingdom</small></p>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        
+                        <div class="mb-4">
+                            <label for="title" class="form-label">
+                                <i class="bi bi-pencil-square"></i> Recipe Title
+                            </label>
+                            <input 
+                                type="text" 
+                                name="title" 
+                                id="title"
+                                class="form-control form-control-lg" 
+                                placeholder="e.g., Traditional English Scones"
+                                required
+                            >
+                        </div>
 
-<form method="POST">
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-    <label>Title</label>
-    <input type="text" name="title" required>
+                        <div class="mb-4">
+                            <label for="cuisine" class="form-label">
+                                <i class="bi bi-globe-americas"></i> Cuisine Type
+                            </label>
+                            <input 
+                                type="text" 
+                                name="cuisine" 
+                                id="cuisine"
+                                class="form-control form-control-lg" 
+                                placeholder="e.g., British, French, Italian"
+                                required
+                            >
+                        </div>
 
-    <label>Cuisine</label>
-    <input type="text" name="cuisine" required>
+                        <div class="mb-4">
+                            <label for="ingredients" class="form-label">
+                                <i class="bi bi-basket-fill"></i> Ingredients
+                            </label>
+                            <textarea 
+                                name="ingredients" 
+                                id="ingredients"
+                                class="form-control" 
+                                rows="6"
+                                placeholder="List all ingredients (one per line)
+Example:
+- 500g plain flour
+- 250ml milk
+- 2 eggs"
+                            ></textarea>
+                        </div>
 
-    <label>Ingredients</label>
-    <textarea name="ingredients"></textarea>
+                        <div class="mb-4">
+                            <label for="steps" class="form-label">
+                                <i class="bi bi-list-ol"></i> Preparation Steps
+                            </label>
+                            <textarea 
+                                name="steps" 
+                                id="steps"
+                                class="form-control" 
+                                rows="8"
+                                placeholder="Describe the cooking steps
+Example:
+1. Preheat oven to 180°C
+2. Mix flour and butter
+3. Add milk gradually..."
+                            ></textarea>
+                        </div>
 
-    <label>Steps</label>
-    <textarea name="steps"></textarea>
-
-    <button type="submit">Create</button>
-</form>
-
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-danger btn-lg">
+                                <i class="bi bi-check-circle-fill"></i> Create Recipe
+                            </button>
+                            <a href="/" class="btn btn-outline-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}

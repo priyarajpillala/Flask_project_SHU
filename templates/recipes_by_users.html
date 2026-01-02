@@ -1,49 +1,107 @@
 {% extends "base.html" %}
 
-
 {% block content %}
+<div class="container mt-4">
+    <div class="text-center mb-5">
+        <h2 class="display-4 fw-bold">
+            <i class="bi bi-people-fill text-danger"></i> Users and Their Recipes
+        </h2>
+        <p class="lead text-muted">Manage all users and their recipe collections</p>
+    </div>
 
-<h2>Users and Their Recipes</h2>
-
-{% for user in users %}
-<h3>
-    {{ user.username }} (ID: {{ user.id }})
-
-    <form action="/admin/delete-user/{{ user.id }}/"
-          method="post"
-          style="display:inline;"
-          onsubmit="return confirm('Are you sure you want to delete this user? This will remove all their data.');">
-        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
-        <button type="submit">Delete User</button>
-    </form>
-</h3>
-
-<table border="1">
-    <tr>
-        <th>Recipe ID</th>
-        <th>Title</th>
-        <th>Cuisine</th>
-        <th>Action</th>
-    </tr>
-
-    {% for recipe in user_recipes.get(user.id, []) %}
-    <tr>
-        <td>{{ recipe.id }}</td>
-        <td>{{ recipe.title }}</td>
-        <td>{{ recipe.cuisine }}</td>
-        <td>
-            <form action="/admin/delete-recipe/{{ recipe.id }}/" method="post" style="display:inline;" onsubmit="return confirmDelete();">
-                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">    
-                <button type="submit">Delete</button>
+    {% for user in users %}
+    <div class="card shadow-lg border-0 mb-4">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">
+                <i class="bi bi-person-circle"></i> {{ user.username }} 
+                <small class="text-muted">(ID: {{ user.id }})</small>
+            </h3>
+            
+            <form action="/admin/delete-user/{{ user.id }}/"
+                  method="post"
+                  style="display:inline;"
+                  onsubmit="return confirm('Are you sure you want to delete this user? This will remove all their data.');">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-danger">
+                    <i class="bi bi-trash-fill"></i> Delete User
+                </button>
             </form>
-
-            <a href="/update/{{ recipe.id }}/">Edit</a>
-        </td>
-    </tr>
+        </div>
+        
+        <div class="card-body p-0">
+            {% if user_recipes.get(user.id, []) %}
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>
+                                <i class="bi bi-hash"></i> Recipe ID
+                            </th>
+                            <th>
+                                <i class="bi bi-egg-fried"></i> Title
+                            </th>
+                            <th>
+                                <i class="bi bi-globe-americas"></i> Cuisine
+                            </th>
+                            <th class="text-center">
+                                <i class="bi bi-gear-fill"></i> Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for recipe in user_recipes.get(user.id, []) %}
+                        <tr>
+                            <td>{{ recipe.id }}</td>
+                            <td class="fw-bold">{{ recipe.title }}</td>
+                            <td>
+                                <span class="badge bg-primary rounded-pill">{{ recipe.cuisine }}</span>
+                            </td>
+                            <td class="text-center">
+                                <a href="/update/{{ recipe.id }}/" class="btn btn-sm btn-warning me-1">
+                                    <i class="bi bi-pencil-fill"></i> Edit
+                                </a>
+                                
+                                <form action="/admin/delete-recipe/{{ recipe.id }}/" 
+                                      method="post" 
+                                      style="display:inline;" 
+                                      onsubmit="return confirm('Delete this recipe?');">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">    
+                                    <button type="submit" class="btn btn-sm btn-danger">
+                                        <i class="bi bi-trash-fill"></i> Delete
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="p-4 text-center text-muted">
+                <i class="bi bi-info-circle-fill"></i> This user has no recipes yet.
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="card-footer bg-light">
+            <small class="text-muted">
+                <i class="bi bi-info-circle-fill"></i> Total recipes: {{ user_recipes.get(user.id, [])|length }}
+            </small>
+        </div>
+    </div>
     {% endfor %}
-</table>
 
-{% endfor %}
+    <div class="text-center mt-4">
+        <a href="/admin/dashboard/" class="btn btn-secondary btn-lg">
+            <i class="bi bi-arrow-left-circle"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
+
+<script>
+function confirmDelete() {
+    return confirm('Are you sure you want to delete this recipe?');
+}
+</script>
 
 {% endblock %}
