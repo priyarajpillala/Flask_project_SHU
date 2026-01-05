@@ -13,6 +13,13 @@
     {% for r in recipes %}
     <div class="col-md-6 col-lg-4">
         <div class="card h-100 shadow-lg border-0 saved-recipe-card">
+            <!-- Recipe Photo -->
+            <img src="{{ url_for('static', filename='uploads/recipes/' + r.recipe_photo) }}" 
+                 class="card-img-top" 
+                 alt="{{ r.title }}"
+                 style="height: 250px; object-fit: cover;"
+                 onerror="this.src='https://via.placeholder.com/400x250?text=No+Image'">
+            
             <div class="card-body">
                 <h3 class="card-title">
                     <i class="bi bi-star-fill text-warning"></i> {{ r.title }}
@@ -38,6 +45,7 @@
                     </form>
                 </div>
             </div>
+            
             <div class="card-footer bg-light">
                 <small class="text-muted">
                     <i class="bi bi-heart-fill text-danger"></i> Saved to your collection

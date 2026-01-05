@@ -12,7 +12,7 @@
                     <p class="mb-0 mt-2"><small>Share your culinary masterpiece with the kingdom</small></p>
                 </div>
                 <div class="card-body p-4">
-                    <form method="POST">
+                    <form method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         
                         <div class="mb-4">
@@ -41,6 +41,20 @@
                                 placeholder="e.g., British, French, Italian"
                                 required
                             >
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="recipe_photo" class="form-label">
+                        <i class="bi bi-camera-fill"></i> Recipe Photo
+                            </label>
+                        <input 
+                            type="file" 
+                            name="recipe_photo" 
+                            id="recipe_photo"
+                            class="form-control" 
+                            accept="image/*"
+                            >
+                        <small class="text-muted"> PNG, JPG, JPEG, GIF, WEBP</small>
                         </div>
 
                         <div class="mb-4">

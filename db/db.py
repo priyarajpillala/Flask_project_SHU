@@ -69,11 +69,11 @@ def get_recipe_by_id(id):
     return recipe
 
 
-def create_recipe(title, cuisine, ingredients, steps, user_id):
+def create_recipe(title, cuisine, ingredients, steps, user_id, recipe_photo='default_recipe.jpg'):
     conn = get_db_connection()
     conn.execute(
-        "INSERT INTO recipes (title, cuisine, ingredients, steps, user_id) VALUES (?, ?, ?, ?,?)",
-        (title, cuisine, ingredients, steps, user_id)
+        "INSERT INTO recipes (title, cuisine, ingredients, steps, user_id, recipe_photo) VALUES (?, ?, ?, ?, ?, ?)",
+        (title, cuisine, ingredients, steps, user_id, recipe_photo)
     )
     conn.commit()
     conn.close()
@@ -89,12 +89,18 @@ def search_recipes_by_title(query):
 
 
 
-def update_recipe(id, title, cuisine, ingredients, steps):
+def update_recipe(id, title, cuisine, ingredients, steps, recipe_photo=None):
     conn = get_db_connection()
-    conn.execute(
-        "UPDATE recipes SET title=?, cuisine=?, ingredients=?, steps=? WHERE id=?",
-        (title, cuisine, ingredients, steps, id)
-    )
+    if recipe_photo:
+        conn.execute(
+            "UPDATE recipes SET title=?, cuisine=?, ingredients=?, steps=?, recipe_photo=? WHERE id=?",
+            (title, cuisine, ingredients, steps, recipe_photo, id)
+        )
+    else:
+        conn.execute(
+            "UPDATE recipes SET title=?, cuisine=?, ingredients=?, steps=? WHERE id=?",
+            (title, cuisine, ingredients, steps, id)
+        )
     conn.commit()
     conn.close()
 

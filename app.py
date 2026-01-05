@@ -4,25 +4,30 @@ from email.message import EmailMessage
 import smtplib
 import random
 from flask_wtf.csrf import CSRFProtect, generate_csrf
+from werkzeug.utils import secure_filename
+import os
+import time
+
+UPLOAD_FOLDER = 'static/uploads/recipes'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
 
 app = Flask(__name__)
 app.secret_key = "royal_red_secret_key"
 
 csrf = CSRFProtect(app)
  
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5MB
+
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
 @app.context_processor
 def inject_csrf_token():
     return dict(csrf_token=generate_csrf)
-
-
-# OTP = ""
-# for i in range(6):
-#     OTP += str(random.randint(0,9))
-
-# server = smtplib.SMTP('smtp.gmail.com',587)
-# server.starttls()
-# from_mail = "priyarajpillala1999@gmail.com"
-# server.login(from_mail,'fbky qdtm ippg nupj')
 
 @app.route("/")
 def index():
@@ -94,7 +99,7 @@ def register():
         try:
             server = smtplib.SMTP('smtp.gmail.com', 587)
             server.starttls()
-            server.login('priyarajpillala1999@gmail.com', 'fbky qdtm ippg nupj')
+            server.login('priyarajpillala1999@gmail.com', 'fdzv jnvz enla mqwm')
             server.send_message(msg)
             server.quit()  # Close connection after sending
         except Exception as e:
@@ -183,8 +188,17 @@ def create():
         cuisine = request.form["cuisine"]
         ingredients = request.form["ingredients"]
         steps = request.form["steps"]
+        recipe_photo = 'default_recipe.jpg'
+
+        if 'recipe_photo' in request.files:
+            file = request.files['recipe_photo']
+            if file and file.filename != '' and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                filename = f"{user_id}_{int(time.time())}_{filename}"
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                recipe_photo = filename
         
-        create_recipe(title, cuisine, ingredients, steps, user_id)
+        create_recipe(title, cuisine, ingredients, steps, user_id, recipe_photo)
         flash("Recipe created", "success")
         return redirect(url_for("recipes"))
 
@@ -195,12 +209,23 @@ def update(id):
     recipe = get_recipe_by_id(id)
 
     if request.method == "POST":
+        recipe_photo = None
+        
+        if 'recipe_photo' in request.files:
+            file = request.files['recipe_photo']
+            if file and file.filename != '' and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                filename = f"{session['user_id']}_{int(time.time())}_{filename}"
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                recipe_photo = filename
+        
         update_recipe(
             id,
             request.form["title"],
             request.form["cuisine"],
             request.form["ingredients"],
-            request.form["steps"]
+            request.form["steps"],
+            recipe_photo
         )
         flash("Recipe updated", "success")
         return redirect(url_for("recipe", id=id))

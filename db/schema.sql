@@ -15,6 +15,7 @@ CREATE TABLE if not EXISTS recipes (
     ingredients TEXT,
     steps TEXT,
     user_id INTEGER,
+    recipe_photo TEXT DEFAULT 'default_recipe.jpg',
     foreign KEY (user_id) references users(id)
 );
 

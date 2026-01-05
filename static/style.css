@@ -299,3 +299,24 @@ tbody tr:hover {
         font-size: 2rem;
     }
 }
+
+/*  RECIPE PHOTO STYLES  */
+.card-img-top {
+    transition: transform 0.4s ease;
+    border-bottom: 3px solid var(--gold);
+}
+
+.card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+.recipe-card,
+.saved-recipe-card {
+    overflow: hidden;
+}
+
+.recipe-card .card-img-top,
+.saved-recipe-card .card-img-top {
+    height: 250px;
+    object-fit: cover;
+}

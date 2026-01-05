@@ -12,7 +12,7 @@
                     <p class="mb-0 mt-2"><small>Refine your culinary creation</small></p>
                 </div>
                 <div class="card-body p-4">
-                    <form method="POST">
+                    <form method="POST" enctype="multipart/form-data">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         
                         <div class="mb-4">
@@ -41,6 +41,20 @@
                                 value="{{ recipe.cuisine }}" 
                                 required
                             >
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="recipe_photo" class="form-label">
+                            <i class="bi bi-camera-fill"></i> Update Recipe Photo
+                            </label>
+                        <input 
+                            type="file" 
+                            name="recipe_photo" 
+                            id="recipe_photo"
+                            class="form-control" 
+                            accept="image/*"
+                            >
+                    <small class="text-muted">Leave empty to keep current photo • Max 5MB</small>
                         </div>
 
                         <div class="mb-4">
