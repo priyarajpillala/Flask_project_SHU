@@ -103,7 +103,7 @@ def register():
         try:
             server = smtplib.SMTP('smtp.gmail.com', 587)
             server.starttls()
-            server.login('priyarajpillala1999@gmail.com', 'fbky qdtm ippg nupj')
+            server.login('priyarajpillala1999@gmail.com', 'fdzv jnvz enla mqwm')
             server.send_message(msg)
             server.quit()  # Close connection after sending
         except Exception as e:
